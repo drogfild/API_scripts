@@ -1,9 +1,37 @@
+<#
+.SYNOPSIS
+This script searches urlscan.io for domains associated with a given ASN (Autonomous System Number) and outputs the results to a CSV file.
+
+.DESCRIPTION
+The script requires an ASN number as input. It makes a call to the urlscan.io API, retrieves up to 10,000 domain results for the specified ASN, and exports the unique domains to a CSV file named result_urlscanio_[asnNumber].csv.
+
+.PARAMETER asnNumber
+The Autonomous System Number (ASN) for which the search will be conducted.
+
+.EXAMPLE
+PS> .\YourScriptName.ps1 -asnNumber AS200593
+
+.NOTES
+Ensure you have a valid urlscan.io API key and set it in the script before running.
+
+#>
+
 param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$true, HelpMessage="You must provide an ASN number. For example, AS200593.")]
     [string]$asnNumber
 )
 
+if (-not $asnNumber) {
+    Write-Host "No ASN number provided. Use the -asnNumber parameter to specify the ASN. For example: -asnNumber AS200593"
+    exit
+}
+
 $apiKey = ""
+if (-not $apiKey) {
+    Write-Host "API Key is required. Please set your urlscan.io API key in the script."
+    exit
+}
+
 $headers = @{
     "API-Key" = $apiKey
     "Content-Type" = "application/json"
@@ -38,4 +66,3 @@ try {
     $statusDescription = $_.Exception.Response.StatusDescription
     Write-Host "An error occurred: $statusDescription ($statusCode)"
 }
-
